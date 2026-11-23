@@ -11,6 +11,8 @@
 :root{--bg:#05070c;--sf:#0d111a;--bd:#1c2436;--card:#111726;--tx:#e6ebf5;--mut:#8592ad;--g:#00dc82;--r:#ff4d6d;--a:#ffb703;--c:#00f2fe;--b:#5b9dff}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+html,body{overflow-x:hidden;max-width:100vw}
+.sheet{overflow-x:hidden}.lr .btn{flex:none}.lr{flex-wrap:wrap}
 button,select,input,textarea{font:inherit;color:inherit}
 header{position:sticky;top:0;z-index:30;background:rgba(5,7,12,.96);border-bottom:1px solid var(--bd);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .brand{display:flex;align-items:center;gap:8px;min-width:0}
@@ -581,7 +583,7 @@ function render(){
   $('stamp').textContent=ts?('Data: '+new Date(ts).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})):'No data yet - tap Scan';
   let b='';
   if(usingSeed())b+='<div class="banner">Showing the starter list (about 60 large stocks) because no CSV is loaded for this universe. Tap <b>Lists</b> and upload your NSE CSV to get the full universe with sectors.</div>';
-  if(!rows.length&&!busy&&!failed.length)b+='<div class="banner">No price data yet. Tap <b>Scan</b>. If it fails, the app will show the reason and a <b>Test connection</b> button.</div>';
+  if(!rows.length&&!busy&&!failed.length)b+='<div class="banner">No price data yet. Tap <b>Scan</b>. The app first looks for <b>data.json</b> in your GitHub repo (prepared by GitHub Actions); if it is not there it tries Yahoo directly and shows the reason if that fails.</div>';
   if(failed.length&&!busy)b+='<div class="banner">'+failed.length+' symbols failed.'+(lastErr?' Last error: <b>'+esc(lastErr)+'</b>.':'')+' <button class="btn" id="bRetry" style="padding:3px 9px">Retry failed</button> <button class="btn" id="bTest" style="padding:3px 9px">Test connection</button></div>';
   if(alertLog.length)b+='<div class="alog"><b>🔔 Latest L3 zone alerts</b><br>'+alertLog.map(esc).join('<br>')+'</div>';
   $('banner').innerHTML=b;
@@ -672,6 +674,33 @@ function camDetail(x){
   return h+'</table></div>';
 }
 
+/* ---------- GitHub data.json (prepared by GitHub Actions, no proxy needed) ---------- */
+let remoteInfo=null;
+async function fetchJSON(url){
+  const r=await fetchT(url+(url.indexOf('?')<0?'?':'&')+'t='+Date.now(),25000);
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r.json();
+}
+function remoteUrls(){
+  const u=[];
+  try{const m=location.hostname.match(/^([^.]+)\.github\.io$/),repo=location.pathname.split('/')[1];
+    if(m&&repo)u.push('https://raw.githubusercontent.com/'+m[1]+'/'+repo+'/main/data.json');}catch(e){}
+  u.push('data.json');
+  return u;
+}
+async function loadRemote(quiet){
+  let best=null;
+  for(const u of remoteUrls()){try{const j=await fetchJSON(u);if(j&&j.d&&(!best||j.gen>best.gen))best=j;}catch(e){}}
+  if(!best){if(!quiet)toast('data.json not found in your GitHub repo yet',4500);return false;}
+  const keys=Object.keys(best.d);
+  keys.forEach(s=>{data[s]=best.d[s];});
+  remoteInfo={gen:best.gen,n:keys.length};
+  LS.set('mdcpr_data',data);
+  render();checkAlerts();render();
+  if(!quiet)toast('Loaded '+keys.length+' stocks from GitHub data ('+new Date(best.gen).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+')',6000);
+  return true;
+}
+
 /* ---------- alerts + auto refresh ---------- */
 let alerted=LS.get('mdcpr_alerted',{}),alertLog=[],autoT=null;
 function checkAlerts(){
@@ -695,8 +724,9 @@ function setAuto(){
   clearInterval(autoT);autoT=null;
   if(cfg.autoLive>0)autoT=setInterval(autoTick,cfg.autoLive*60000);
 }
-function autoTick(){
+async function autoTick(){
   if(busy)return;
+  if(remoteInfo&&await loadRemote(true))return;
   const syms=allRows().filter(x=>camHits(x).length).map(x=>x.s);
   if(syms.length)runJob('live',syms,true);
 }
@@ -810,6 +840,7 @@ function openLists(){
   UNIV.forEach(u=>{if(u[0]==='MY')return;const n=(lists[u[0]]||[]).length;
     h+='<div class="lr"><div><b>'+u[1]+'</b><small>'+(n?n+' symbols loaded':'not loaded')+' · '+hint[u[0]]+'</small></div><button class="btn" data-up="'+u[0]+'">Upload</button></div>';});
   h+='<div style="margin-top:10px"><label class="l">My list (paste symbols)</label><textarea id="myTa" rows="3" placeholder="RELIANCE, TCS, HAL ...">'+esc((lists.MY||[]).join(', '))+'</textarea><button class="btn" id="bMy" style="margin-top:6px">Save my list</button></div>';
+  h+='<div style="margin-top:12px"><label class="l">GitHub data (no proxy, no payment)</label><div class="sec" style="margin-bottom:6px">Copies every loaded symbol (one per line) so you can paste it into <b>symbols.txt</b> in your GitHub repo.</div><button class="btn" id="bCopySyms">Copy all symbols</button></div>';
   h+='<div style="margin-top:12px"><label class="l">Price data connection</label><button class="btn" id="bTest">Test connection</button><div id="testOut" class="txt" style="margin-top:6px"></div></div>';
   h+='<div style="margin-top:10px"><label class="l">Optional proxy (only if the test fails)</label><input type="text" id="pxIn" value="'+esc(cfg.proxy||'')+'" placeholder="https://your-worker.workers.dev/?url={url}">'
    +'<details style="margin-top:6px"><summary class="sec" style="cursor:pointer">Free Cloudflare worker code</summary><textarea id="wkCode" rows="8" readonly style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;margin-top:6px">'+esc(WORKER_CODE)+'</textarea><button class="btn" id="bCopyW" style="margin-top:6px">Copy code</button></details></div>';
@@ -849,6 +880,13 @@ document.addEventListener('click',e=>{
   if(t.id==='bClear'){data={};LS.set('mdcpr_data',data);render();toast('Scan data cleared');}
   if(t.id==='bRetry'){const f=failed.slice();runJob('full',f);}
   if(t.id==='bTest'){openLists();runTest();}
+  if(t.id==='bCopySyms'){
+    const set=new Set();(lists.ALL||[]).forEach(s=>set.add(s));
+    Object.keys(lists).forEach(k=>(lists[k]||[]).forEach(s=>set.add(s)));
+    if(!set.size)SEED.forEach(x=>set.add(x[0]));
+    const txt=Array.from(set).join('\n');
+    try{navigator.clipboard.writeText(txt).then(()=>toast(set.size+' symbols copied. Paste into symbols.txt',5000),()=>toast('Copy failed, allow clipboard and retry',5000));}catch(er){toast('Copy not supported here',4000);}
+  }
   if(t.id==='bCopyW'){try{navigator.clipboard.writeText(WORKER_CODE);toast('Code copied');}catch(er){$('wkCode').select();toast('Select and copy the code');}}
   if(t.id==='bReset'){cfg.tfReq=[];cfg.fresh='ALL';cfg.shape='ALL';cfg.q='';cfg.freshN=5;cfg.sector=null;cfg.camSec=null;shown=60;saveCfg();syncControls();render();}
   if(t.id==='bAlerts'){cfg.alerts=!cfg.alerts;saveCfg();if(cfg.alerts&&'Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission();}catch(er){}}render();}
@@ -856,8 +894,8 @@ document.addEventListener('click',e=>{
   if(t.id==='fmStar')starPreset();
   if(t.id==='fmDel')delPreset();
 });
-$('bScan').onclick=()=>runJob('full',univSyms());
-$('bLive').onclick=()=>{const s=univSyms().filter(x=>data[x]);if(!s.length){toast('Run Scan first');return;}runJob('live',s);};
+$('bScan').onclick=async()=>{if(busy)return;if(await loadRemote(false))return;runJob('full',univSyms());};
+$('bLive').onclick=async()=>{if(busy)return;if(await loadRemote(false))return;const s=univSyms().filter(x=>data[x]);if(!s.length){toast('Run Scan first');return;}runJob('live',s);};
 $('bLists').onclick=openLists;
 $('bCancel').onclick=()=>{cancel=true;};
 $('fUniv').onchange=e=>{cfg.univ=e.target.value;cfg.sector=null;shown=60;saveCfg();render();};
@@ -877,6 +915,7 @@ document.addEventListener('change',e=>{
 
 syncControls();renderPresets();setAuto();
 render();
+loadRemote(true);
 </script>
 </body>
 </html>
