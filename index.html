@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,12 +34,12 @@ main{padding:10px;max-width:900px;margin:0 auto}
 .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 label.l{display:block;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;color:var(--g)}
-select,input[type=text],input[type=search],textarea{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:8px 9px;outline:0}
+select,input[type=text],input[type=search],input[type=number],textarea{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:8px 9px;outline:0}
 select:focus,input:focus,textarea:focus{border-color:var(--g)}
 .chip{padding:5px 9px;border-radius:9px;border:1px solid var(--bd);background:var(--sf);font-weight:700;font-size:11px;color:var(--mut);cursor:pointer}
 .chip.on{background:rgba(0,220,130,.14);border-color:rgba(0,220,130,.5);color:var(--g)}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:4px;margin-top:10px}
-.tabs button{border:0;background:none;padding:8px 4px;border-radius:9px;font-weight:800;font-size:12px;color:var(--mut)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:4px;margin-top:10px}
+.tabs button{border:0;background:none;padding:8px 2px;border-radius:9px;font-weight:800;font-size:11px;color:var(--mut)}
 .tabs button.on{background:var(--g);color:#04120c}
 .banner{background:rgba(255,183,3,.1);border:1px solid rgba(255,183,3,.35);color:var(--a);border-radius:12px;padding:8px 10px;margin-top:10px;font-size:12px}
 .sh{display:flex;justify-content:space-between;align-items:center;margin:12px 2px 6px;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:#cbd5e8}
@@ -88,6 +87,15 @@ td{padding:6px 3px;border-bottom:1px solid rgba(28,36,54,.7);vertical-align:top}
 .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#1b2540;border:1px solid var(--bd);padding:8px 14px;border-radius:12px;z-index:90;display:none;font-size:12px;max-width:90vw}
 .lr{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd)}
 .lr div{flex:1;min-width:0}.lr small{color:var(--mut);display:block;font-size:10.5px}
+.cm{border-top:1px solid var(--bd);padding:6px 0 2px;margin-top:6px}
+.bd{display:inline-block;border-radius:7px;padding:1px 7px;font-size:10px;font-weight:900;margin-left:4px}
+.s-W{background:rgba(133,146,173,.18);color:#b8c3da}.s-T{background:rgba(255,183,3,.16);color:var(--a)}.s-I{background:rgba(0,242,254,.16);color:var(--c)}.s-A{background:rgba(0,220,130,.18);color:var(--g)}
+.kv{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:3px;font-size:11px;color:#cdd6ea}
+.kv b{font-family:ui-monospace,Menlo,monospace}
+.ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:7px}
+.alog{background:rgba(0,242,254,.08);border:1px solid rgba(0,242,254,.35);color:var(--c);border-radius:12px;padding:8px 10px;margin-top:10px;font-size:12px}
+select.sm{width:auto;padding:6px 8px}
+input.sm{width:80px;padding:6px 8px}
 @media(max-width:420px){.cards{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -107,7 +115,7 @@ td{padding:6px 3px;border-bottom:1px solid rgba(28,36,54,.7);vertical-align:top}
     <div class="cd"><span>Scanned</span><b id="cScan">0</b></div>
     <div class="cd"><span>Full Ladder 6/6</span><b class="up" id="cFull">0</b></div>
     <div class="cd"><span>Base-up (from Y)</span><b style="color:var(--c)" id="cBase">0</b></div>
-    <div class="cd"><span>Fresh D / W cross</span><b class="am" id="cFresh">0</b></div>
+    <div class="cd"><span>Fresh cross (any TF)</span><b class="am" id="cFresh">0</b></div>
   </div>
 
   <div id="banner"></div>
@@ -120,7 +128,7 @@ td{padding:6px 3px;border-bottom:1px solid rgba(28,36,54,.7);vertical-align:top}
         <option value="ladder">Ladder strength</option><option value="fresh">Most recent cross</option>
         <option value="chg">Day change %</option><option value="az">A to Z</option></select></div>
     </div>
-    <div class="grid3" style="margin-top:8px">
+    <div class="grid3 ladonly" style="margin-top:8px">
       <div><label class="l">"Fresh" means crossed within</label><select id="fN">
         <option value="1">Today only</option><option value="2">2 days</option><option value="3">3 days</option>
         <option value="5">5 days</option><option value="10">10 days</option></select></div>
@@ -133,14 +141,22 @@ td{padding:6px 3px;border-bottom:1px solid rgba(28,36,54,.7);vertical-align:top}
         <option value="BASE">Base-up (starts from Yearly)</option><option value="MID">Mid-up (starts below Yearly)</option>
         <option value="BROKEN">Broken (gaps)</option><option value="NONE">None above</option></select></div>
     </div>
-    <div class="row" style="margin-top:9px"><span class="sec">Close above CPR in:</span>
+    <div class="row ladonly" style="margin-top:9px"><span class="sec">Close above CPR in:</span>
       <button class="chip" data-tf="Y">Y</button><button class="chip" data-tf="HY">HY</button><button class="chip" data-tf="Q">Q</button>
       <button class="chip" data-tf="M">M</button><button class="chip" data-tf="W">W</button><button class="chip" data-tf="D">D</button>
+      <button class="btn" id="bReset" style="margin-left:auto;padding:5px 9px">Reset filters</button>
     </div>
   </div>
 
+  <div class="panel" id="fmPanel">
+    <label class="l" style="margin:0">Saved formulas</label>
+    <div class="ctl"><select id="fmSel" style="flex:1;min-width:140px;width:auto"></select>
+      <button class="btn" id="fmSave">Save</button><button class="btn" id="fmStar">☆ Make default</button><button class="btn" id="fmDel">Delete</button></div>
+    <div class="sec" id="fmNote" style="margin-top:6px"></div>
+  </div>
+
   <div class="tabs">
-    <button data-tab="stock">Stock-wise</button><button data-tab="sector">Sector-wise</button><button data-tab="recent">Recent D / W Cross</button>
+    <button data-tab="stock">Stocks</button><button data-tab="sector">Sectors</button><button data-tab="recent">Recent Cross</button><button data-tab="cam">L3 Zone</button>
   </div>
   <div id="view"></div>
 
@@ -151,6 +167,7 @@ td{padding:6px 3px;border-bottom:1px solid rgba(28,36,54,.7);vertical-align:top}
     ▲▲ Higher Value, ▲ Higher (overlap), ▼▼ Lower Value, ▼ Lower (overlap), ◇ Inside, ◈ Outside.
     <br>Base-up = ladder starts from Yearly and builds toward Daily. Mid-up = starts from a middle timeframe while higher ones are still not crossed.
     <br>CPR for a period is calculated from the previous completed period: Pivot=(H+L+C)/3, BC=(H+L)/2, TC=2*Pivot-BC. Yearly/Half-Yearly/Quarterly use calendar periods.
+    <br><b>L3 Zone scan:</b> uses the Camarilla L3 and CPR of the last completed Week / Month / Quarter / Half-Year / Year (these are the levels now in effect). A stock qualifies when L3 is within your % of the Pivot, L3 lies between BC and TC, and the zone (BC to TC) is above the previous close. Watching = zone above price. Touched / Inside / Crossed = the latest daily candle has reached the zone.
   </div>
 </main>
 
@@ -202,9 +219,10 @@ function analyze(bars){
       const pi=pidx[i]-1;if(pi<0)break;
       if(closes[i]>cprs[pi].t)hr++;else{broke=true;break;}
     }
-    lv[tf]={t:c1.t,b:c1.b,p:c1.p,pt:c0?c0.t:null,pb:c0?c0.b:null,pp:c0?c0.p:null,tr:trendOf(c1,c0),hr:hr,open:!broke};
+    const pr=per[cur-1];
+    lv[tf]={t:c1.t,b:c1.b,p:c1.p,pt:c0?c0.t:null,pb:c0?c0.b:null,pp:c0?c0.p:null,tr:trendOf(c1,c0),hr:hr,open:!broke,l3:pr.c-1.1*(pr.h-pr.l)/4};
   }
-  return{px:closes[n-1],prev:closes[n-2],ld:istParts(bars[n-1].ts).ymd,lv:lv};
+  return{px:closes[n-1],prev:closes[n-2],ld:istParts(bars[n-1].ts).ymd,lv:lv,th:bars[n-1].h,tl:bars[n-1].l,to:bars[n-1].o};
 }
 function evalStock(rec,N){
   const r={st:{},run:{},fresh:{},open:{},dist:{},above:0,freshCnt:0};
@@ -236,11 +254,26 @@ function ladderOf(r){
   else if(last<5)next=TFS[last+1];
   return{type:type,cnt:cnt,label:label,next:next,ordered:ordered,gaps:gaps,first:first,last:last};
 }
+/* Next-period (levels now in effect) Camarilla L3 near Pivot, inside CPR, zone above previous close */
+function camOf(rec,tf,tol){
+  const L=rec.lv&&rec.lv[tf];
+  if(!L||L.l3==null||!(L.p>0))return null;
+  const gap=Math.abs(L.l3-L.p)/L.p*100;
+  if(gap>tol)return null;
+  if(L.l3<L.b||L.l3>L.t)return null;
+  const lo=L.b,hi=L.t,px=rec.px,prev=rec.prev;
+  if(!(prev<lo))return null;
+  const top=rec.th!=null?Math.max(rec.th,px):px;
+  let state;
+  if(top>=lo)state=px>hi?'ABOVE':(px>=lo?'INSIDE':'TOUCH');
+  else state='WATCH';
+  return{tf:tf,state:state,gap:gap,l3:L.l3,p:L.p,bc:lo,tc:hi,dist:(lo/px-1)*100,hiToday:top};
+}
 /*CORE_END*/
 
 /* ================= APP ================= */
 const $=id=>document.getElementById(id);
-const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v,(kk,x)=>typeof x==='number'?Math.round(x*1e4)/1e4:x));return true;}catch(e){return false;}}};
 const UNIV=[['N500','Nifty 500'],['FNO','F&O stocks'],['ALL','All NSE cash stocks'],['N50','Nifty 50'],['N200','Nifty 200'],['MID','Midcap 250 / LargeMidcap 250'],['SML','Smallcap 250'],['MY','My pasted list']];
 const SEED=[
 ['HDFCBANK','Banking & Finance'],['ICICIBANK','Banking & Finance'],['SBIN','Banking & Finance'],['KOTAKBANK','Banking & Finance'],['AXISBANK','Banking & Finance'],['INDUSINDBK','Banking & Finance'],['BAJFINANCE','Banking & Finance'],['BAJAJFINSV','Banking & Finance'],['SHRIRAMFIN','Banking & Finance'],['HDFCLIFE','Banking & Finance'],['SBILIFE','Banking & Finance'],
@@ -256,7 +289,11 @@ const SEED=[
 ['HAL','Capital Goods'],['BEL','Capital Goods'],['MAZDOCK','Capital Goods'],['BDL','Capital Goods']];
 const IDX_SKIP=new Set(['NIFTY','BANKNIFTY','FINNIFTY','MIDCPNIFTY','NIFTYNXT50','NIFTY50']);
 
-let cfg=Object.assign({univ:'N500',freshN:5,sort:'ladder',tab:'stock',tfReq:[],fresh:'ALL',shape:'ALL',proxy:'',sector:null,q:''},LS.get('mdcpr_cfg',{}));
+let cfg=Object.assign({univ:'N500',freshN:5,sort:'ladder',tab:'stock',tfReq:[],fresh:'ALL',shape:'ALL',proxy:'',sector:null,q:'',camTfs:['W','M','Q','HY','Y'],camTol:0.10,camMode:'ALL',camSec:null,alerts:false,autoLive:0,recTfs:['D','W']},LS.get('mdcpr_cfg',{}));
+let presets=LS.get('mdcpr_presets',[]);
+const PKEYS=['univ','freshN','sort','tab','tfReq','fresh','shape','q','camTfs','camTol','camMode','alerts','autoLive','recTfs'];
+let curPreset='';
+(function(){const s=presets.find(p=>p.star);if(s){Object.assign(cfg,JSON.parse(JSON.stringify(s.cfg)));cfg.sector=null;cfg.camSec=null;curPreset=s.id;}})();
 let lists=LS.get('mdcpr_lists',{});
 let sectors=LS.get('mdcpr_sectors',{});
 let names=LS.get('mdcpr_names',{});
@@ -320,10 +357,14 @@ function parsePasted(t){
 }
 
 /* ---------- fetching ---------- */
-function proxies(){
-  if(cfg.proxy&&cfg.proxy.indexOf('{url}')>=0)return[u=>cfg.proxy.replace('{url}',encodeURIComponent(u))];
-  return[u=>u,u=>'https://corsproxy.io/?url='+encodeURIComponent(u),u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u)];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let lastErr='';
+function routes(all){
+  const base=[['Direct',u=>u],['corsproxy.io',u=>'https://corsproxy.io/?url='+encodeURIComponent(u)],['allorigins',u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u)],['codetabs',u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u)]];
+  const cu=(cfg.proxy&&cfg.proxy.indexOf('{url}')>=0)?[['Your proxy',u=>cfg.proxy.replace('{url}',encodeURIComponent(u))]]:[];
+  return all?cu.concat(base):(cu.length?cu:base);
 }
+const WORKER_CODE="export default {\n  async fetch(req) {\n    const u = new URL(req.url).searchParams.get('url');\n    if (!u || !/^https:\\/\\/query[12]\\.finance\\.yahoo\\.com\\//.test(u)) return new Response('bad', {status: 400});\n    const r = await fetch(u, {headers: {'User-Agent': 'Mozilla/5.0'}});\n    return new Response(r.body, {status: r.status, headers: {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}});\n  }\n}";
 async function fetchT(url,ms){
   const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
   try{return await fetch(url,{signal:c.signal});}finally{clearTimeout(t);}
@@ -345,29 +386,31 @@ function parseChart(res){
   }
   return bars;
 }
-async function yfetch(sym,range){
+async function yfetch(sym,range,only){
   const path='/v8/finance/chart/'+encodeURIComponent(sym+'.NS')+'?range='+range+'&interval=1d&includePrePost=false';
   const hosts=['https://query1.finance.yahoo.com','https://query2.finance.yahoo.com'];
-  const px=proxies();let err;
-  for(let a=0;a<4;a++){
-    const wrap=px[(pIdx+a)%px.length];
+  const R=only?[only]:routes();let err;
+  const tries=Math.min(R.length*2,6);
+  for(let a=0;a<tries;a++){
+    const ri=(pIdx+a)%R.length,rt=R[ri];
     try{
-      const r=await fetchT(wrap(hosts[a%2]+path),16000);
-      if(r.status===404)throw new Error('404');
+      const r=await fetchT(rt[1](hosts[a%2]+path),16000);
+      if(r.status===404)throw new Error('404 not found');
+      if(r.status===429){await sleep(900*(a+1));throw new Error('HTTP 429 (too many requests)');}
       if(!r.ok)throw new Error('HTTP '+r.status);
       const j=await r.json();
       const res=j.chart&&j.chart.result&&j.chart.result[0];
       if(!res)throw new Error('no data');
-      pIdx=(pIdx+a)%px.length;
+      if(!only)pIdx=ri;
       return parseChart(res);
-    }catch(e){err=e;if(String(e.message)==='404')break;}
+    }catch(e){err=e;lastErr=rt[0]+': '+(e.name==='AbortError'?'timeout':e.message);if(String(e.message).indexOf('404')===0)break;}
   }
   throw err;
 }
 async function scanOne(sym){
   const bars=await yfetch(sym,'3y');
   const a=analyze(bars);if(!a)throw new Error('short');
-  data[sym]={px:a.px,prev:a.prev,lv:a.lv,ld:a.ld,sd:todayIST(),t:Date.now()};
+  data[sym]={px:a.px,prev:a.prev,lv:a.lv,ld:a.ld,th:a.th,tl:a.tl,to:a.to,sd:todayIST(),t:Date.now()};
 }
 async function liveOne(sym){
   const rec=data[sym];
@@ -376,7 +419,7 @@ async function liveOne(sym){
   if(!bars.length)throw new Error('none');
   const lb=bars[bars.length-1];
   if(istParts(lb.ts).ymd!==rec.ld)return scanOne(sym);
-  rec.px=lb.c;rec.t=Date.now();
+  rec.px=lb.c;rec.th=lb.h;rec.tl=lb.l;rec.to=lb.o;rec.t=Date.now();
   if(bars.length>1)rec.prev=bars[bars.length-2].c;
 }
 async function pool(items,worker,conc,onProg){
@@ -386,21 +429,26 @@ async function pool(items,worker,conc,onProg){
     done++;onProg(done,items.length);}};
   await Promise.all(Array.from({length:conc},run));
 }
-async function runJob(kind,syms){
+async function runJob(kind,syms,quiet){
   if(busy)return;
   if(!syms.length){toast('No symbols in this universe');return;}
-  busy=true;cancel=false;failed=[];
-  $('prog').style.display='block';
+  busy=true;cancel=false;failed=[];lastErr='';
+  $('prog').style.display=quiet?'none':'block';
   let lastR=0;
   const t0=Date.now();
-  await pool(syms,kind==='live'?liveOne:scanOne,6,(d,n)=>{
+  await pool(syms,kind==='live'?liveOne:scanOne,4,(d,n)=>{
     $('pFill').style.width=(d/n*100)+'%';
     $('pTxt').textContent=(kind==='live'?'Live update ':'Scanning ')+d+' / '+n+(failed.length?'  (failed '+failed.length+')':'');
     if(Date.now()-lastR>1500){lastR=Date.now();render();}
   });
-  LS.set('mdcpr_data',data);
+  const saved=LS.set('mdcpr_data',data);
   busy=false;$('prog').style.display='none';
-  toast((cancel?'Stopped. ':'Done. ')+(syms.length-failed.length)+' updated'+(failed.length?', '+failed.length+' failed':'')+' in '+Math.round((Date.now()-t0)/1000)+'s',4200);
+  if(!quiet){
+    toast((cancel?'Stopped. ':'Done. ')+(syms.length-failed.length)+' updated'+(failed.length?', '+failed.length+' failed'+(lastErr?' ('+lastErr+')':''):'')+' in '+Math.round((Date.now()-t0)/1000)+'s',6000);
+    if(!saved)setTimeout(()=>toast('Phone storage is full: results stay only until you close the app',5000),6200);
+  }
+  render();
+  checkAlerts();
   render();
 }
 
@@ -486,16 +534,24 @@ function renderView(rows){
   const v=$('view');
   const pass=rows.filter(passes);
   if(cfg.tab==='stock'){v.innerHTML=stockListView(sortRows(pass),'Stocks','tap a stock for ladder detail');}
+  else if(cfg.tab==='cam'){v.innerHTML=camView(rows);}
   else if(cfg.tab==='recent'){
-    const rec=rows.filter(x=>{
-      if(!(x.ev.fresh.D||x.ev.fresh.W))return false;
-      const keep=Object.assign({},cfg,{fresh:'ALL'});
-      if(cfg.q){const q=cfg.q.toLowerCase();if(x.s.toLowerCase().indexOf(q)<0)return false;}
+    const sel=cfg.recTfs||[];
+    const base=rows.filter(x=>{
+      if(cfg.q){const q=cfg.q.toLowerCase();if(x.s.toLowerCase().indexOf(q)<0&&(names[x.s]||'').toLowerCase().indexOf(q)<0)return false;}
       for(const tf of cfg.tfReq)if(x.ev.st[tf]!=='A')return false;
       return cfg.shape==='ALL'||x.lad.type===cfg.shape;
     });
-    rec.sort((p,q)=>Math.min(p.ev.fresh.D?p.ev.run.D:99,p.ev.fresh.W?p.ev.run.W:99)-Math.min(q.ev.fresh.D?q.ev.run.D:99,q.ev.fresh.W?q.ev.run.W:99)||q.lad.cnt-p.lad.cnt);
-    v.innerHTML=stockListView(rec,'Recently crossed D / W CPR','within last '+cfg.freshN+' day(s) · shows ladder above');
+    const cnt={};TFS.slice().reverse().forEach(t=>cnt[t]=base.filter(x=>x.ev.fresh[t]).length);
+    let h='<div class="panel"><label class="l">Recently crossed CPR: pick timeframes</label><div class="ctl">'
+      +TFS.slice().reverse().map(t=>'<button class="chip'+(sel.indexOf(t)>=0?' on':'')+'" data-rtf="'+t+'">'+TFN[t]+' ('+cnt[t]+')</button>').join('')
+      +'</div><div class="ctl"><span class="sec">Crossed within</span><select id="selRecN" class="sm">'+[1,2,3,5,10].map(n=>'<option value="'+n+'"'+(n===cfg.freshN?' selected':'')+'>'+(n===1?'Today only':n+' days')+'</option>').join('')+'</select></div>'
+      +'<div class="sec" style="margin-top:6px">Close crossed from inside/below to above that timeframe\'s CPR. You can pick one or several timeframes.</div></div>';
+    const rec=sel.length?base.filter(x=>sel.some(t=>x.ev.fresh[t])):[];
+    const key=x=>Math.min.apply(null,sel.map(t=>x.ev.fresh[t]?x.ev.run[t]:99));
+    rec.sort((p,q)=>key(p)-key(q)||q.lad.cnt-p.lad.cnt);
+    h+=sel.length?stockListView(rec,'Recently crossed: '+sel.slice().sort((a,b)=>TFS.indexOf(a)-TFS.indexOf(b)).join(' + '),'within last '+cfg.freshN+' day(s)'):'<div class="panel sec">Select at least one timeframe above.</div>';
+    v.innerHTML=h;
   }else{
     if(cfg.sector){
       const rs=sortRows(pass.filter(x=>x.sec===cfg.sector));
@@ -520,16 +576,186 @@ function render(){
   $('cScan').textContent=rows.length+'/'+univSyms().length;
   $('cFull').textContent=rows.filter(x=>x.lad.type==='FULL').length;
   $('cBase').textContent=rows.filter(x=>x.lad.type==='BASE'||x.lad.type==='FULL').length;
-  $('cFresh').textContent=rows.filter(x=>x.ev.fresh.D||x.ev.fresh.W).length;
+  $('cFresh').textContent=rows.filter(x=>x.ev.freshCnt>0).length;
   let ts=0;rows.forEach(x=>{if(x.rec.t>ts)ts=x.rec.t;});
   $('stamp').textContent=ts?('Data: '+new Date(ts).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})):'No data yet - tap Scan';
   let b='';
   if(usingSeed())b+='<div class="banner">Showing the starter list (about 60 large stocks) because no CSV is loaded for this universe. Tap <b>Lists</b> and upload your NSE CSV to get the full universe with sectors.</div>';
-  if(failed.length&&!busy)b+='<div class="banner">'+failed.length+' symbols failed (new listings or network). <button class="btn" id="bRetry" style="padding:3px 9px">Retry failed</button></div>';
+  if(!rows.length&&!busy&&!failed.length)b+='<div class="banner">No price data yet. Tap <b>Scan</b>. If it fails, the app will show the reason and a <b>Test connection</b> button.</div>';
+  if(failed.length&&!busy)b+='<div class="banner">'+failed.length+' symbols failed.'+(lastErr?' Last error: <b>'+esc(lastErr)+'</b>.':'')+' <button class="btn" id="bRetry" style="padding:3px 9px">Retry failed</button> <button class="btn" id="bTest" style="padding:3px 9px">Test connection</button></div>';
+  if(alertLog.length)b+='<div class="alog"><b>🔔 Latest L3 zone alerts</b><br>'+alertLog.map(esc).join('<br>')+'</div>';
   $('banner').innerHTML=b;
   document.querySelectorAll('.tabs button').forEach(e=>e.classList.toggle('on',e.dataset.tab===cfg.tab));
-  document.querySelectorAll('.chip').forEach(e=>e.classList.toggle('on',cfg.tfReq.indexOf(e.dataset.tf)>=0));
+  document.querySelectorAll('.ladonly').forEach(e=>e.style.display=cfg.tab==='cam'?'none':'');
+  document.querySelectorAll('.chip[data-tf]').forEach(e=>e.classList.toggle('on',cfg.tfReq.indexOf(e.dataset.tf)>=0));
   renderView(rows);
+}
+
+/* ---------- L3 zone scan ---------- */
+const CAM_TFS=['W','M','Q','HY','Y'];
+const STL={WATCH:'Watching',TOUCH:'Touched zone',INSIDE:'Inside zone',ABOVE:'Crossed above'};
+const STC={WATCH:'s-W',TOUCH:'s-T',INSIDE:'s-I',ABOVE:'s-A'};
+const STO={INSIDE:0,TOUCH:1,ABOVE:2,WATCH:3};
+function camHits(x){const o=[];cfg.camTfs.forEach(tf=>{const c=camOf(x.rec,tf,cfg.camTol);if(c)o.push(c);});return o;}
+function camText(c){
+  if(c.state==='WATCH')return 'Zone is '+c.dist.toFixed(2)+'% above price. Waiting for the candle to reach it.';
+  if(c.state==='TOUCH')return 'Latest candle touched the zone (high '+fmt(c.hiToday)+'), close still below it.';
+  if(c.state==='INSIDE')return 'Latest candle crossed into the zone, close is inside it.';
+  return 'Latest candle crossed through the zone, close is above it.';
+}
+function camCard(x,hs){
+  let h='<div class="st" data-s="'+esc(x.s)+'"><div class="top"><div><div class="sym">'+esc(x.s)+'</div><div class="sec">'+esc(x.sec)+(names[x.s]?' · '+esc(names[x.s]).slice(0,28):'')+'</div></div>'
+   +'<div class="px">'+fmt(x.rec.px)+'<div class="'+(x.chg>=0?'up':'dn')+'" style="font-size:11px">'+(x.chg>=0?'+':'')+x.chg.toFixed(2)+'%</div></div></div>';
+  hs.forEach(c=>{
+    h+='<div class="cm"><span class="tag t-mid">'+c.tf+'</span><span class="bd '+STC[c.state]+'">'+STL[c.state]+'</span>'
+     +'<div class="txt" style="margin-top:3px">'+camText(c)+'</div>'
+     +'<div class="kv"><span>L3 <b>'+fmt(c.l3)+'</b></span><span>Pivot <b>'+fmt(c.p)+'</b></span><span>CPR <b>'+fmt(c.bc)+' - '+fmt(c.tc)+'</b></span><span>L3 vs Pivot <b>'+c.gap.toFixed(3)+'%</b></span></div></div>';
+  });
+  return h+'<div class="txt" style="margin-top:6px"><span class="tag '+tagClass(x.lad.type)+'">'+x.lad.label+'</span></div></div>';
+}
+function camView(rows){
+  const on=(a,b)=>a===b?' on':'';
+  let h='<div class="panel"><label class="l">L3 zone scan: levels now in effect (last completed period)</label>'
+   +'<div class="ctl"><span class="sec">Timeframes</span>'+CAM_TFS.map(t=>'<button class="chip'+(cfg.camTfs.indexOf(t)>=0?' on':'')+'" data-ctf="'+t+'">'+t+'</button>').join('')+'</div>'
+   +'<div class="ctl"><span class="sec">L3 within % of Pivot</span>'+[0.05,0.10,0.25,0.50].map(v=>'<button class="chip'+on(v,cfg.camTol)+'" data-ctol="'+v+'">'+v.toFixed(2)+'</button>').join('')
+   +'<input type="number" step="0.01" min="0.01" id="inpTol" class="sm" value="'+cfg.camTol+'"></div>'
+   +'<div class="ctl"><span class="sec">Show</span>'+[['ALL','All'],['CROSS','Crossing now'],['WATCH','Watching']].map(m=>'<button class="chip'+on(m[0],cfg.camMode)+'" data-cmode="'+m[0]+'">'+m[1]+'</button>').join('')+'</div>'
+   +'<div class="ctl"><button class="btn'+(cfg.alerts?' on':'')+'" id="bAlerts">🔔 Alerts: '+(cfg.alerts?'ON':'OFF')+'</button><span class="sec">Auto live refresh</span>'
+   +'<select id="selAuto" class="sm">'+[[0,'Off'],[1,'1 min'],[2,'2 min'],[5,'5 min'],[10,'10 min']].map(o=>'<option value="'+o[0]+'"'+(o[0]===cfg.autoLive?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></div>'
+   +'<div class="sec" style="margin-top:6px">Alerts and auto refresh work only while this page is open on your phone.</div></div>';
+  if(!rows.length)return h+'<div class="panel sec">No price data yet. Tap <b>Scan</b> first.</div>';
+  if(!cfg.camTfs.length)return h+'<div class="panel sec">Select at least one timeframe above.</div>';
+  const base=rows.filter(x=>{
+    if(cfg.q){const q=cfg.q.toLowerCase();if(x.s.toLowerCase().indexOf(q)<0&&(names[x.s]||'').toLowerCase().indexOf(q)<0)return false;}
+    return true;});
+  let list=[];
+  base.forEach(x=>{const hs=camHits(x);if(hs.length)list.push({x:x,hs:hs});});
+  const isX=c=>c.state!=='WATCH';
+  const nCross=list.filter(o=>o.hs.some(isX)).length,nWatch=list.filter(o=>o.hs.some(c=>!isX(c))).length;
+  list=list.map(o=>({x:o.x,hs:o.hs.filter(c=>cfg.camMode==='ALL'||(cfg.camMode==='CROSS'?isX(c):!isX(c)))})).filter(o=>o.hs.length);
+  const sm={};list.forEach(o=>{sm[o.x.sec]=(sm[o.x.sec]||0)+1;});
+  const keys=Object.keys(sm).sort((a,b)=>sm[b]-sm[a]||(a<b?-1:1));
+  if(cfg.camSec&&!sm[cfg.camSec])cfg.camSec=null;
+  const totalN=list.length;
+  if(cfg.camSec)list=list.filter(o=>o.x.sec===cfg.camSec);
+  list.forEach(o=>o.hs.sort((a,b)=>STO[a.state]-STO[b.state]||Math.abs(a.dist)-Math.abs(b.dist)));
+  list.sort((a,b)=>STO[a.hs[0].state]-STO[b.hs[0].state]||Math.abs(a.hs[0].dist)-Math.abs(b.hs[0].dist));
+  h+='<div class="sh"><span>L3 zone stocks ('+list.length+')</span><small>crossing now: '+nCross+' · watching: '+nWatch+'</small></div>';
+  if(keys.length){
+    h+='<div class="ctl" style="margin:0 0 8px"><button class="chip'+(cfg.camSec?'':' on')+'" data-camsec="">All sectors ('+totalN+')</button>'
+     +keys.map(k=>'<button class="chip'+(cfg.camSec===k?' on':'')+'" data-camsec="'+esc(k)+'">'+esc(k)+' ('+sm[k]+')</button>').join('')+'</div>';
+  }
+  if(!list.length)return h+'<div class="panel sec">No stock matches right now. Try a larger % (0.25 or 0.50), more timeframes, or a bigger universe.</div>';
+  list.slice(0,shown).forEach(o=>{h+=camCard(o.x,o.hs);});
+  if(list.length>shown)h+='<button class="btn more" id="bMore">Show more ('+(list.length-shown)+' left)</button>';
+  return h;
+}
+function camClick(el){
+  const d=el.dataset;
+  if(d.rtf){cfg.recTfs=cfg.recTfs||[];const i=cfg.recTfs.indexOf(d.rtf);if(i>=0)cfg.recTfs.splice(i,1);else cfg.recTfs.push(d.rtf);}
+  else if(d.ctf){const i=cfg.camTfs.indexOf(d.ctf);if(i>=0)cfg.camTfs.splice(i,1);else cfg.camTfs.push(d.ctf);}
+  else if(d.ctol){cfg.camTol=parseFloat(d.ctol);}
+  else if(d.cmode){cfg.camMode=d.cmode;}
+  else if(d.camsec!==undefined){cfg.camSec=d.camsec||null;}
+  shown=60;saveCfg();render();
+}
+function camDetail(x){
+  let h='<div class="sh"><span>Next-period Camarilla L3 vs CPR</span><small>levels now in effect</small></div><div style="overflow-x:auto"><table><tr><th>TF</th><th>L3</th><th>Pivot</th><th>CPR (BC - TC)</th><th>L3 vs Pivot</th><th>Status</th></tr>';
+  CAM_TFS.forEach(tf=>{
+    const L=x.rec.lv[tf];
+    if(!L||L.l3==null){h+='<tr><td><b>'+tf+'</b></td><td colspan="5" class="sec">not enough history</td></tr>';return;}
+    const gap=Math.abs(L.l3-L.p)/L.p*100,inside=L.l3>=L.b&&L.l3<=L.t,c=camOf(x.rec,tf,cfg.camTol);
+    h+='<tr><td><b>'+tf+'</b></td><td class="mono">'+fmt(L.l3)+'</td><td class="mono">'+fmt(L.p)+'</td><td class="mono">'+fmt(L.b)+' - '+fmt(L.t)+'</td>'
+     +'<td class="mono'+(gap<=cfg.camTol&&inside?' up':'')+'">'+gap.toFixed(3)+'%'+(inside?'':' (L3 outside CPR)')+'</td>'
+     +'<td>'+(c?'<span class="bd '+STC[c.state]+'" style="margin:0">'+STL[c.state]+'</span>':'-')+'</td></tr>';
+  });
+  return h+'</table></div>';
+}
+
+/* ---------- alerts + auto refresh ---------- */
+let alerted=LS.get('mdcpr_alerted',{}),alertLog=[],autoT=null;
+function checkAlerts(){
+  if(!cfg.alerts)return;
+  const hits=[];
+  for(const x of allRows()){for(const c of camHits(x)){
+    if(c.state==='WATCH')continue;
+    const k=x.s+'|'+c.tf+'|'+x.rec.ld;
+    if(alerted[k])continue;
+    alerted[k]=1;hits.push(x.s+' '+c.tf+': '+STL[c.state]);}}
+  if(!hits.length)return;
+  const ks=Object.keys(alerted);if(ks.length>1500)ks.slice(0,ks.length-1000).forEach(k=>delete alerted[k]);
+  LS.set('mdcpr_alerted',alerted);
+  const stamp=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  alertLog=hits.map(s=>stamp+'  '+s).concat(alertLog).slice(0,8);
+  toast('🔔 L3 zone: '+hits.slice(0,4).join(', ')+(hits.length>4?' +'+(hits.length-4)+' more':''),8000);
+  try{if(navigator.vibrate)navigator.vibrate([200,100,200]);}catch(e){}
+  try{if('Notification' in window&&Notification.permission==='granted')new Notification('L3 zone crossing',{body:hits.slice(0,6).join('\n')});}catch(e){}
+}
+function setAuto(){
+  clearInterval(autoT);autoT=null;
+  if(cfg.autoLive>0)autoT=setInterval(autoTick,cfg.autoLive*60000);
+}
+function autoTick(){
+  if(busy)return;
+  const syms=allRows().filter(x=>camHits(x).length).map(x=>x.s);
+  if(syms.length)runJob('live',syms,true);
+}
+
+/* ---------- saved formulas ---------- */
+function syncControls(){fillUniv();$('fSort').value=cfg.sort;$('fN').value=String(cfg.freshN);$('fFresh').value=cfg.fresh;$('fShape').value=cfg.shape;$('fQ').value=cfg.q||'';}
+function snapCfg(){const o={};PKEYS.forEach(k=>{o[k]=JSON.parse(JSON.stringify(cfg[k]===undefined?null:cfg[k]));});return o;}
+function renderPresets(){
+  const s=$('fmSel');
+  s.innerHTML='<option value="">- current settings (not saved) -</option>'+presets.map(p=>'<option value="'+p.id+'">'+(p.star?'★ ':'')+esc(p.name)+'</option>').join('');
+  s.value=curPreset;
+  const p=presets.find(q=>q.id===curPreset);
+  $('fmStar').textContent=p&&p.star?'★ Default':'☆ Make default';
+  $('fmNote').textContent=presets.length?(presets.some(q=>q.star)?'The ★ formula loads automatically when you open the app. Pick another one from the list to switch.':'Tap ☆ Make default to open the app with a formula.'):'Set your timeframes and filters, then tap Save to keep this formula.';
+}
+function savePreset(){
+  const cur=presets.find(p=>p.id===curPreset);
+  const name=(prompt('Formula name',cur?cur.name:'')||'').trim();
+  if(!name)return;
+  let p=presets.find(q=>q.name.toLowerCase()===name.toLowerCase());
+  if(p)p.cfg=snapCfg();
+  else{p={id:'f'+Date.now(),name:name,star:false,cfg:snapCfg()};presets.push(p);}
+  curPreset=p.id;LS.set('mdcpr_presets',presets);renderPresets();toast('Formula saved: '+name);
+}
+function loadPreset(id){
+  curPreset=id;
+  const p=presets.find(q=>q.id===id);
+  if(p){Object.assign(cfg,JSON.parse(JSON.stringify(p.cfg)));cfg.sector=null;cfg.camSec=null;shown=60;saveCfg();syncControls();setAuto();render();}
+  renderPresets();
+}
+function starPreset(){
+  const p=presets.find(q=>q.id===curPreset);
+  if(!p){toast('Save or select a formula first');return;}
+  if(p.star)p.star=false;else{presets.forEach(q=>q.star=false);p.star=true;}
+  LS.set('mdcpr_presets',presets);renderPresets();toast(p.star?'Default formula: '+p.name:'Default removed');
+}
+function delPreset(){
+  const p=presets.find(q=>q.id===curPreset);
+  if(!p){toast('Select a formula to delete');return;}
+  if(!confirm('Delete formula "'+p.name+'"?'))return;
+  presets=presets.filter(q=>q.id!==p.id);curPreset='';LS.set('mdcpr_presets',presets);renderPresets();toast('Deleted');
+}
+
+/* ---------- connection test ---------- */
+async function runTest(){
+  const out=$('testOut');if(!out)return;
+  out.innerHTML='Testing...';
+  const R=routes(true);let html='',ok=false;
+  for(let i=0;i<R.length;i++){
+    const t0=Date.now();
+    try{
+      const b=await yfetch('RELIANCE','5d',R[i]);
+      html+='<div class="up">✓ '+esc(R[i][0])+' works ('+(Date.now()-t0)+' ms)</div>';
+      if(!ok){ok=true;const j=routes().findIndex(r=>r[0]===R[i][0]);if(j>=0)pIdx=j;}
+    }catch(e){html+='<div class="dn">✕ '+esc(R[i][0])+': '+esc(e.name==='AbortError'?'timeout':e.message)+'</div>';}
+    out.innerHTML=html;
+  }
+  html+=ok?'<div class="sec" style="margin-top:6px">A route works. Close this and tap Scan again.</div>':'<div class="sec" style="margin-top:6px">No route works from this network. Create the free worker below and paste its link in the proxy box.</div>';
+  out.innerHTML=html;
 }
 
 /* ---------- detail modal ---------- */
@@ -572,7 +798,7 @@ function openDetail(sym){
     const chgp=L.pp?((L.p/L.pp-1)*100):null,tr=TR[L.tr];
     h+='<tr><td><b>'+tf+'</b><div class="sec">'+TFN[tf]+'</div></td><td class="'+cls+'">'+s1+'</td><td class="mono">'+fmt(L.b)+' - '+fmt(L.t)+'</td>'
      +'<td class="mono">'+fmt(L.pp)+' → '+fmt(L.p)+(chgp!=null?'<div class="'+(chgp>=0?'up':'dn')+'">'+(chgp>=0?'+':'')+chgp.toFixed(1)+'%</div>':'')+'</td><td class="'+tr[1]+'">'+TRN[L.tr]+'</td></tr>';});
-  h+='</table></div><button class="btn more" id="bCloseD" style="margin-top:10px">Close</button>';
+  h+='</table></div>'+camDetail(x)+'<button class="btn more" id="bCloseD" style="margin-top:10px">Close</button>';
   $('detailBody').innerHTML=h;$('mDetail').classList.add('show');
 }
 
@@ -584,7 +810,9 @@ function openLists(){
   UNIV.forEach(u=>{if(u[0]==='MY')return;const n=(lists[u[0]]||[]).length;
     h+='<div class="lr"><div><b>'+u[1]+'</b><small>'+(n?n+' symbols loaded':'not loaded')+' · '+hint[u[0]]+'</small></div><button class="btn" data-up="'+u[0]+'">Upload</button></div>';});
   h+='<div style="margin-top:10px"><label class="l">My list (paste symbols)</label><textarea id="myTa" rows="3" placeholder="RELIANCE, TCS, HAL ...">'+esc((lists.MY||[]).join(', '))+'</textarea><button class="btn" id="bMy" style="margin-top:6px">Save my list</button></div>';
-  h+='<div style="margin-top:10px"><label class="l">Optional CORS proxy (if price data fails)</label><input type="text" id="pxIn" value="'+esc(cfg.proxy||'')+'" placeholder="https://your-worker.workers.dev/?url={url}"></div>';
+  h+='<div style="margin-top:12px"><label class="l">Price data connection</label><button class="btn" id="bTest">Test connection</button><div id="testOut" class="txt" style="margin-top:6px"></div></div>';
+  h+='<div style="margin-top:10px"><label class="l">Optional proxy (only if the test fails)</label><input type="text" id="pxIn" value="'+esc(cfg.proxy||'')+'" placeholder="https://your-worker.workers.dev/?url={url}">'
+   +'<details style="margin-top:6px"><summary class="sec" style="cursor:pointer">Free Cloudflare worker code</summary><textarea id="wkCode" rows="8" readonly style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;margin-top:6px">'+esc(WORKER_CODE)+'</textarea><button class="btn" id="bCopyW" style="margin-top:6px">Copy code</button></details></div>';
   h+='<div class="row" style="margin-top:12px"><button class="btn" id="bClear">Clear saved scan data</button><button class="btn pri" id="bCloseL" style="margin-left:auto">Done</button></div>';
   $('listsBody').innerHTML=h;$('mLists').classList.add('show');
 }
@@ -611,7 +839,8 @@ document.addEventListener('click',e=>{
   const sc=t.closest('.sc');if(sc){cfg.sector=sc.dataset.sec;shown=60;saveCfg();render();window.scrollTo(0,0);return;}
   const up=t.closest('[data-up]');if(up){uploadFor(up.dataset.up);return;}
   const tab=t.closest('[data-tab]');if(tab){cfg.tab=tab.dataset.tab;cfg.sector=null;shown=60;saveCfg();render();return;}
-  const chip=t.closest('.chip');if(chip){const k=chip.dataset.tf,i=cfg.tfReq.indexOf(k);if(i>=0)cfg.tfReq.splice(i,1);else cfg.tfReq.push(k);saveCfg();render();return;}
+  const cc=t.closest('[data-ctf],[data-ctol],[data-cmode],[data-camsec],[data-rtf]');if(cc){camClick(cc);return;}
+  const chip=t.closest('.chip[data-tf]');if(chip){const k=chip.dataset.tf,i=cfg.tfReq.indexOf(k);if(i>=0)cfg.tfReq.splice(i,1);else cfg.tfReq.push(k);saveCfg();render();return;}
   if(t.id==='bBack'){cfg.sector=null;render();return;}
   if(t.id==='bMore'){shown+=60;render();return;}
   if(t.id==='bCloseD'||t.id==='mDetail')$('mDetail').classList.remove('show');
@@ -619,6 +848,13 @@ document.addEventListener('click',e=>{
   if(t.id==='bMy'){lists.MY=parsePasted($('myTa').value);LS.set('mdcpr_lists',lists);fillUniv();toast(lists.MY.length+' symbols saved');}
   if(t.id==='bClear'){data={};LS.set('mdcpr_data',data);render();toast('Scan data cleared');}
   if(t.id==='bRetry'){const f=failed.slice();runJob('full',f);}
+  if(t.id==='bTest'){openLists();runTest();}
+  if(t.id==='bCopyW'){try{navigator.clipboard.writeText(WORKER_CODE);toast('Code copied');}catch(er){$('wkCode').select();toast('Select and copy the code');}}
+  if(t.id==='bReset'){cfg.tfReq=[];cfg.fresh='ALL';cfg.shape='ALL';cfg.q='';cfg.freshN=5;cfg.sector=null;cfg.camSec=null;shown=60;saveCfg();syncControls();render();}
+  if(t.id==='bAlerts'){cfg.alerts=!cfg.alerts;saveCfg();if(cfg.alerts&&'Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission();}catch(er){}}render();}
+  if(t.id==='fmSave')savePreset();
+  if(t.id==='fmStar')starPreset();
+  if(t.id==='fmDel')delPreset();
 });
 $('bScan').onclick=()=>runJob('full',univSyms());
 $('bLive').onclick=()=>{const s=univSyms().filter(x=>data[x]);if(!s.length){toast('Run Scan first');return;}runJob('live',s);};
@@ -630,9 +866,16 @@ $('fSort').onchange=e=>{cfg.sort=e.target.value;saveCfg();render();};
 $('fN').onchange=e=>{cfg.freshN=+e.target.value;saveCfg();render();};
 $('fFresh').onchange=e=>{cfg.fresh=e.target.value;saveCfg();render();};
 $('fShape').onchange=e=>{cfg.shape=e.target.value;saveCfg();render();};
-document.addEventListener('change',e=>{if(e.target.id==='pxIn'){cfg.proxy=e.target.value.trim();saveCfg();toast('Proxy saved');}});
+document.addEventListener('change',e=>{
+  const id=e.target.id;
+  if(id==='pxIn'){cfg.proxy=e.target.value.trim();saveCfg();toast('Proxy saved');}
+  else if(id==='fmSel')loadPreset(e.target.value);
+  else if(id==='selRecN'){cfg.freshN=+e.target.value;$('fN').value=String(cfg.freshN);saveCfg();render();}
+  else if(id==='selAuto'){cfg.autoLive=+e.target.value;saveCfg();setAuto();toast(cfg.autoLive?'Auto live refresh every '+cfg.autoLive+' min':'Auto refresh off');}
+  else if(id==='inpTol'){const v=parseFloat(e.target.value);if(v>0){cfg.camTol=v;saveCfg();render();}}
+});
 
-fillUniv();$('fSort').value=cfg.sort;$('fN').value=String(cfg.freshN);$('fFresh').value=cfg.fresh;$('fShape').value=cfg.shape;$('fQ').value=cfg.q||'';
+syncControls();renderPresets();setAuto();
 render();
 </script>
 </body>
